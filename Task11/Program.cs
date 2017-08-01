@@ -24,17 +24,20 @@ namespace Task11
             ResetColor();
         }
 
-        const string Alphabet0 = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
-        const string Alphabet1 = "жгвбыршчонмлпьхфизцаяюэеутёъщкйдс";
+        const string Alphabet0 = " абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        const string Alphabet1 = " жгвбыршчонмлпьхфизцаяюэеутёъщкйдс";
         static string OldAlphabet = "";
         static string NewAlphabet = "";
+
         static void MakeAlphabet(out string oldAlph, out string newAlph)
         {
+            oldAlph = " ";
+            newAlph = " ";
+            Clear();
+
             while (true)
             {
                 ResetColor();
-                oldAlph = string.Empty;
-                newAlph = string.Empty;
                 WriteLine("Введите пары символов;\nПервый - Кодируемый\nВторой - Код");
 
                 WriteLine("Было:  {0}", oldAlph);
@@ -43,7 +46,7 @@ namespace Task11
                 if (pair == string.Empty)
                     break;
 
-                pair = pair.Trim();
+                pair = pair.Replace(" ","");
                 if (pair.Length != 2)
                 {
                     Clear();
@@ -77,6 +80,7 @@ namespace Task11
 
                 oldAlph += pair[0];
                 newAlph += pair[1];
+                Clear();
             }
 
             ResetColor();
@@ -117,14 +121,14 @@ namespace Task11
                     var key = ReadKey(true);
                     if (key.Key == ConsoleKey.Y)
                     {
-                        Write(key.KeyChar);
+                        Write(key.Key.ToString());
                         MakeAlphabet(out OldAlphabet,out NewAlphabet);
                         break;
                     }
 
                     if (key.Key == ConsoleKey.N)
                     {
-                        Write(key.KeyChar);
+                        Write(key.Key.ToString());
                         OldAlphabet = Alphabet0;
                         NewAlphabet = Alphabet1;
                         break;
@@ -147,7 +151,7 @@ namespace Task11
  {0}
 Стало:
  {1}
-", Alphabet0, NewAlphabet);
+", OldAlphabet, NewAlphabet);
 
                     Write(
 @"Выберите действие
@@ -165,7 +169,20 @@ namespace Task11
                     WriteLine(key.KeyChar);
 
                     WriteLine("Введите кодируемое сообщение");
-                    WriteLine("Закодированное:\n{0}",Encode(ReadLine()));
+                    string msg = ReadLine();
+
+                    string newmsg = string.Empty;
+                    foreach (char c in msg)
+                        if (OldAlphabet.Contains(c.ToString()))
+                            newmsg += c;
+
+                    if (newmsg != msg)
+                    {
+                        ForegroundColor = ConsoleColor.Red;
+                        WriteLine("Были удалены некторые символы");
+                        ResetColor();
+                    }
+                    WriteLine("Было:\n{0}\nСтало:\n{1}",newmsg,Encode(newmsg));
 
                     ReadKey(true);
                     continue;
@@ -176,7 +193,20 @@ namespace Task11
                     WriteLine(key.KeyChar);
 
                     WriteLine("Введите декодируемое сообщение");
-                    WriteLine("Раскодированное:\n{0}", Decode(ReadLine()));
+                    string msg = ReadLine();
+
+                    string newmsg = string.Empty;
+                    foreach (char c in msg)
+                        if (NewAlphabet.Contains(c.ToString()))
+                            newmsg += c;
+
+                    if (newmsg != msg)
+                    {
+                        ForegroundColor = ConsoleColor.Red;
+                        WriteLine("Были удалены некторые символы");
+                        ResetColor();
+                    }
+                    WriteLine("Было:\n{0}\nСтало:\n{1}", newmsg, Decode(newmsg));
 
                     ReadKey(true);
                     continue;
