@@ -29,21 +29,28 @@ namespace Task11
             ResetColor();
         }
 
-        static readonly string Alphabet0 = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
-        static readonly string Alphabet1 = "жгвбыршчонмлпьхфизцаяюэеутёъщкйдс";
+        const string Alphabet0 = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        const string Alphabet1 = "жгвбыршчонмлпьхфизцаяюэеутёъщкйдс";
         static string NewAlphabet = "";
 
-        static char EncodeChar(char c)
+        static char EncodeChar(char c, string alph0,string alph1)
         {
-            int i = Alphabet0.IndexOf(c);
-            return i == -1? c: NewAlphabet[i];
+            int i = alph0.IndexOf(c);
+            return i == -1? c: alph1[i];
         }
-
         static string Encode(string s)
         {
             string output = string.Empty;
             foreach (char c in s)
-                output += EncodeChar(c);
+                output += EncodeChar(c,Alphabet0,NewAlphabet);
+
+            return output;
+        }
+        static string Decode(string s)
+        {
+            string output = string.Empty;
+            foreach (char c in s)
+                output += EncodeChar(c, NewAlphabet, Alphabet0);
 
             return output;
         }
@@ -75,18 +82,67 @@ namespace Task11
                     NewAlphabet = Alphabet1;
                     break;
                 }
-                
+
                 FlashingWarning(yn);
             }
 
             CursorVisible = true;
             Clear();
 
-            WriteLine("Кодировка:\n{0}\n{1}\n",Alphabet0,NewAlphabet);
+            while (true)
+            {
+                string choice = "[1/2/3] ";
+                {
+                    WriteLine(
+@"Кодировка:
+Было:
+ {0}
+Стало:
+ {1}
+", Alphabet0, NewAlphabet);
 
+                    Write(
+@"Выберите действие
+1. Закодировать
+2. Раскодировать
+3. Выход
+{0}", choice);
+                }
 
+                bool done = false;
+                var key = ReadKey(true);
 
+                if (key.KeyChar == '1')
+                {
+                    WriteLine(key.KeyChar);
 
+                    WriteLine("Введите кодируемое сообщение");
+                    WriteLine("Закодированное:");
+                    WriteLine(Encode(ReadLine()));
+
+                    ReadKey(true);
+                    Clear();
+                }
+
+                if (key.KeyChar == '2')
+                {
+                    Write(key.KeyChar);
+
+                    WriteLine("Введите декодируемое сообщение");
+                    WriteLine("Раскодированное:");
+                    WriteLine(Decode(ReadLine()));
+
+                    ReadKey(true);
+                    Clear();
+                }
+
+                if (key.KeyChar == '3')
+                    break;
+
+                FlashingWarning(choice);
+
+            }
+            
 
 
 
