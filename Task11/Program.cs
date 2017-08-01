@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 using static System.Console;
 
@@ -16,7 +11,7 @@ namespace Task11
             CursorLeft = 0;
             ForegroundColor = fore;
             Write(s);
-            Thread.Sleep(t);
+            System.Threading.Thread.Sleep(t);
         }
         static void FlashingWarning(string s)
         {
@@ -31,7 +26,61 @@ namespace Task11
 
         const string Alphabet0 = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
         const string Alphabet1 = "жгвбыршчонмлпьхфизцаяюэеутёъщкйдс";
+        static string OldAlphabet = "";
         static string NewAlphabet = "";
+        static void MakeAlphabet(out string oldAlph, out string newAlph)
+        {
+            while (true)
+            {
+                ResetColor();
+                oldAlph = string.Empty;
+                newAlph = string.Empty;
+                WriteLine("Введите пары символов;\nПервый - Кодируемый\nВторой - Код");
+
+                WriteLine("Было:  {0}", oldAlph);
+                WriteLine("Стало: {0}", newAlph);
+                string pair = ReadLine();
+                if (pair == string.Empty)
+                    break;
+
+                pair = pair.Trim();
+                if (pair.Length != 2)
+                {
+                    Clear();
+                    ForegroundColor = ConsoleColor.Red;
+                    WriteLine("Введите два символа");
+                    continue;
+                }
+
+                string newpair = string.Empty;
+                foreach (char c in pair)
+                    if (char.IsLetterOrDigit(c))
+                        newpair += c;
+
+                pair = newpair;
+                if (pair.Length != 2)
+                {
+                    Clear();
+                    ForegroundColor = ConsoleColor.Red;
+                    WriteLine("Введите буквы или цифры");
+                    continue;
+                }
+
+                if (oldAlph.Contains(pair[0].ToString())
+                    || newAlph.Contains(pair[1].ToString()))
+                {
+                    Clear();
+                    ForegroundColor = ConsoleColor.Red;
+                    WriteLine("Нельзя иметь повторяющтеся символы");
+                    continue;
+                }
+
+                oldAlph += pair[0];
+                newAlph += pair[1];
+            }
+
+            ResetColor();
+        }
 
         static char EncodeChar(char c, string alph0,string alph1)
         {
@@ -42,7 +91,7 @@ namespace Task11
         {
             string output = string.Empty;
             foreach (char c in s)
-                output += EncodeChar(c,Alphabet0,NewAlphabet);
+                output += EncodeChar(c,OldAlphabet,NewAlphabet);
 
             return output;
         }
@@ -50,47 +99,46 @@ namespace Task11
         {
             string output = string.Empty;
             foreach (char c in s)
-                output += EncodeChar(c, NewAlphabet, Alphabet0);
+                output += EncodeChar(c, NewAlphabet, OldAlphabet);
 
             return output;
         }
 
-        static string MakeAlphabet()
-        {
-            return string.Empty;
-        }
 
         static void Main(string[] args)
         {
-            WriteLine("Создать новую таблциу кодировки? ");
-            string yn = "[Y/N] ";
-            CursorVisible = false;
-
-            while (true)
             {
-                var key = ReadKey(true);
-                if (key.Key == ConsoleKey.N)
+                string yn = "[Y/N] ";
+                Write("Создать новую таблциу кодировки?\n{0}",yn);
+                CursorVisible = false;
+
+                while (true)
                 {
-                    Write(key.KeyChar);
-                    NewAlphabet = MakeAlphabet();
-                    break;
+                    var key = ReadKey(true);
+                    if (key.Key == ConsoleKey.Y)
+                    {
+                        Write(key.KeyChar);
+                        MakeAlphabet(out OldAlphabet,out NewAlphabet);
+                        break;
+                    }
+
+                    if (key.Key == ConsoleKey.N)
+                    {
+                        Write(key.KeyChar);
+                        OldAlphabet = Alphabet0;
+                        NewAlphabet = Alphabet1;
+                        break;
+                    }
+
+                    FlashingWarning(yn);
                 }
 
-                if (key.Key == ConsoleKey.Y)
-                {
-                    Write(key.KeyChar);
-                    NewAlphabet = Alphabet1;
-                    break;
-                }
-
-                FlashingWarning(yn);
+                CursorVisible = true;
             }
 
-            CursorVisible = true;
-            Clear();
-
             while (true)
             {
+                Clear();
                 string choice = "[1/2/3] ";
                 {
                     WriteLine(
@@ -117,42 +165,31 @@ namespace Task11
                     WriteLine(key.KeyChar);
 
                     WriteLine("Введите кодируемое сообщение");
-                    WriteLine("Закодированное:");
-                    WriteLine(Encode(ReadLine()));
+                    WriteLine("Закодированное:\n{0}",Encode(ReadLine()));
 
                     ReadKey(true);
-                    Clear();
+                    continue;
                 }
 
                 if (key.KeyChar == '2')
                 {
-                    Write(key.KeyChar);
+                    WriteLine(key.KeyChar);
 
                     WriteLine("Введите декодируемое сообщение");
-                    WriteLine("Раскодированное:");
-                    WriteLine(Decode(ReadLine()));
+                    WriteLine("Раскодированное:\n{0}", Decode(ReadLine()));
 
                     ReadKey(true);
-                    Clear();
+                    continue;
                 }
 
-                if (key.KeyChar == '3')
-                    break;
+                if (key.KeyChar == '3' || key.Key == ConsoleKey.Escape)
+                {
+                    WriteLine(key.KeyChar);
+                    return;
+                }
 
                 FlashingWarning(choice);
-
             }
-            
-
-
-
-
-
-
-
-
-
-            ReadKey(true);
         }
     }
 }
