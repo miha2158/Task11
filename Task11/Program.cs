@@ -4,12 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static System.Console;
+
 namespace Task11
 {
     class Program
     {
+        static readonly string alphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
         static void Main(string[] args)
         {
+
+            ReadKey(true);
         }
     }
 }
